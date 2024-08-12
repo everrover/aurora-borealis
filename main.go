@@ -1,11 +1,10 @@
 package main
 
 import (
+	"aurora-borealis/handlers"
+	"aurora-borealis/utils"
 	"fmt"
 	"net/http"
-
-	"github.com/yourusername/markdown-webapp/handlers"
-	"github.com/yourusername/markdown-webapp/utils"
 )
 
 func main() {
@@ -14,6 +13,9 @@ func main() {
 
 	// Set up routes
 	http.HandleFunc("/create-post", handlers.CreatePostHandler)
+	//http.HandleFunc("/delete-post", handlers.CreatePostHandler)
+	//http.HandleFunc("/update-post", handlers.CreatePostHandler)
+	http.HandleFunc("/get-post", handlers.CreatePostHandler)
 
 	// Start the server
 	fmt.Println("Starting server on :8080...")
