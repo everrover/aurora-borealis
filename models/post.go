@@ -1,32 +1,18 @@
 package models
 
-type CreateRequestPost struct {
-	Media   string `json:"media"`   // ip - user - video, audio, image, and others path
-	Content string `json:"content"` // ip - user
-}
-
-type UpdateRequestPost struct {
-	Media   string `json:"media"`   // ip - user - video, audio, image, and others path
-	Content string `json:"content"` // ip - user
-	ID      string `json:"id"`      // ip - user
-}
-
-type DeleteRequestPost struct {
-	ID string `json:"id"` // ip - user
-}
-
 // Post represents a markdown post
 type Post struct {
 	Media      string            `json:"media"`     // ip - user - video, audio, image, and others path
 	Content    string            `json:"content"`   // ip - user
 	SelfLike   bool              `json:"self_like"` // ip - user
+	Tags       []string          `json:"tags"`      // prefixed with #
 	ID         string            `json:"id"`        // auto generated
 	PostedAt   string            `json:"posted_at"` // ip - system
 	Author     string            `json:"author"`    // ip - system
 	Slug       string            `json:"slug"`      // ip - system
 	Metadata   string            `json:"metadata"`  // auto-gen via AI analysis
-	Comments   []Comment         `json:"comments"`
-	Likes      int               `json:"likes"`
+	Comments   []Comment         `json:"comments"`  // CommentIDs
+	Likes      int               `json:"likes"`     // Count of likes
 	WhatAISays map[string]string `json:"what_ai_says"`
 }
 

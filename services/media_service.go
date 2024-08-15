@@ -8,7 +8,7 @@ import (
 )
 
 // SaveToElasticsearch indexes the post in Elasticsearch
-func SaveToElasticsearch(post models.Post) error {
+func RunMediaAnalysis(post models.Post) error {
 	doc := map[string]interface{}{
 		//"title":   post.Title,
 		"content": post.Content,

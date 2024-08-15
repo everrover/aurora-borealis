@@ -12,12 +12,13 @@ func main() {
 	utils.Initialize()
 
 	// Set up routes
-	http.HandleFunc("/create-post", handlers.CreatePostHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /create-post", handlers.CreatePostHandler)
 	//http.HandleFunc("/delete-post", handlers.CreatePostHandler)
 	//http.HandleFunc("/update-post", handlers.CreatePostHandler)
 	http.HandleFunc("/get-post", handlers.CreatePostHandler)
 
 	// Start the server
 	fmt.Println("Starting server on :8080...")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("localhost:8080", nil)
 }
