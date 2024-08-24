@@ -20,6 +20,7 @@ func extractTags(content string) ([]string, error) {
 		if strings.HasPrefix(word, "#") {
 			tag := strings.Replace(word, "_", "-", -1)
 			// remove all extra symbols ❗️ TODO
+			tag = strings.Replace(tag, ".", "", -1)
 			tags = append(tags, tag)
 		}
 	}
@@ -38,36 +39,46 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	var postContents string = postReq.Content
 	var postMediaLinks []string = postReq.Media
+	var author string = postReq.User
+	var location string = postReq.Location
+	var weather string = postReq.Weather
+	postedAt := time.Now().Format(time.RFC3339)
+
+	if len(postMediaLinks) > 10 {
+		http.Error(w, "Media links should be less than 10 and content should not be empty", http.StatusBadRequest)
+		return
+	}
 
 	if len(postContents) == 0 && len(postMediaLinks) == 0 {
 		http.Error(w, "Empty post", http.StatusBadRequest)
 		return
 	}
 
-	tags, err := extractTags(postContents)
+	hashtags, err := extractTags(postContents)
 	if err != nil {
 		http.Error(w, "Error extracting tags", http.StatusInternalServerError)
 	}
 
-	postedAt := time.Now().Format(time.RFC3339)
-	/*
-		generate slug
-		generate short summary
-		generate title
-		generate sentiment
-		generate category
-		generate AI thoughts
-		generate AI tags
-		Run postReq analysis*/
-	analysisMeta, err := services.RunNLPAnalysis(postContents, tags, postMediaLinks)
+	var postForAnalysis *models.PostRequestForAnalysis = models.NewPostRequestForAnalysis(
+		postContents, postMediaLinks, author,
+		location, weather, hashtags,
+		string(postedAt))
+	// call api to get media analysis
+	//analysisMeta, err := services.RunMediaAnalysis(postForAnalysis)
+
+	analysisMeta, err := services.RunNLPAnalysis(*postForAnalysis)
+	if analysisMeta != nil && (len(analysisMeta.Hashtags) > 0) {
+		hashtags = append(hashtags, analysisMeta.Hashtags...)
+	}
 	if err != nil {
 		http.Error(w, "Error running analysis", http.StatusInternalServerError)
 	}
 
-	// Run media analysis
-	// analysisMeta, err := services.RunNLPAnalysis(postReq.Content)
-
 	fmt.Println(analysisMeta)
+
+	// Create post entity
+
+	// Create post file and upload it
 
 	//var post models.Post = models.NewPost(postMediaLink, postContents, "user")
 

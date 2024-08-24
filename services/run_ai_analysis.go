@@ -1,30 +1,58 @@
 package services
 
 import (
+	models "aurora-borealis/models"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	http "net/http"
 )
 
 const (
 	// NLPAnalysisURL is the URL for the NLP analysis service
-	CORE_NLP_ANALYSIS = "http://localhost:8100/core-analyze"
+	CORE_NLP_ANALYSIS = "http://localhost:8888/bots/journal/post/analyze"
 	NEXT_NLP_ANALYSIS = "http://localhost:8200/next-analyze"
 )
 
-func RunNLPAnalysis(post_contents string, tags []string, mediaLinks []string) (string, error) {
-	// Fetch data from the URL
-	//data, err := fetchDataViaPost(CORE_NLP_ANALYSIS, post_contents)
-	//if err != nil {
-	//	return "", err
-	//}
-	//
-	//// Perform NLP analysis
-	////analysis, err := (data)
-	//if err != nil {
-	//	return "", err
-	//}
-	//
-	//return analysis, nil
-	return "", nil
+func RunNLPAnalysis(post models.PostRequestForAnalysis) (*models.PostAnalysisResponse, error) {
+	jsonData, err := json.Marshal(post)
+	if err != nil {
+		fmt.Println("Error marshalling post data", err)
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", CORE_NLP_ANALYSIS, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("Error creating request", err)
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response", err)
+		return nil, err
+	}
+
+	var analysisMetaActual models.PostAnalysisResponseActual
+	var analysisMeta models.PostAnalysisResponse
+	err = json.Unmarshal(body, &analysisMetaActual)
+	analysisMeta = analysisMetaActual.Response
+	if err != nil {
+		fmt.Println("Error unmarshalling response", err)
+		return nil, err
+	}
+
+	return &analysisMeta, nil
 }
 
 func fetchDataGet(url string) (string, error) {

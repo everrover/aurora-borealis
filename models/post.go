@@ -16,6 +16,23 @@ type Post struct {
 	WhatAISays map[string]string `json:"what_ai_says"`
 }
 
+func NewPost(slug string, media string, content string, author string, hashtags []string, postedAt string) *Post {
+	return &Post{
+		Media:      media,
+		Content:    content,
+		SelfLike:   false,
+		Tags:       hashtags,
+		ID:         "",
+		PostedAt:   postedAt,
+		Author:     author,
+		Slug:       slug,
+		Metadata:   "",
+		Comments:   []Comment{},
+		Likes:      0,
+		WhatAISays: map[string]string{},
+	}
+}
+
 // Comment represents a comment on a post
 type Comment struct {
 	Content  string `json:"content"`
