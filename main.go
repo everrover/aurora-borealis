@@ -17,11 +17,23 @@ func main() {
 	// Set up routes
 	//mux := http.NewServeMux()
 	router := gmux.NewRouter()
-	router.Methods("POST").Path("/create-post").HandlerFunc(handlers.CreatePostHandler)
-	//mux.HandleFunc("POST /create-post", handlers.CreatePostHandler)
-	//http.HandleFunc("/delete-post", handlers.CreatePostHandler)
-	//http.HandleFunc("/update-post", handlers.CreatePostHandler)
-	//http.HandleFunc("/get-post", handlers.CreatePostHandler)
+	router.Methods("POST").Path("/post").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("GET").Path("/post").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("GET").Path("/posts").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("PUT").Path("/post").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("DELETE").Path("/post").HandlerFunc(handlers.CreatePostHandler)
+
+	router.Methods("POST").Path("/media").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("DELETE").Path("/media").HandlerFunc(handlers.CreatePostHandler)
+
+	router.Methods("POST").Path("/habit").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("GET").Path("/habit").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("GET").Path("/habits").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("PUT").Path("/habit").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("DELETE").Path("/habit").HandlerFunc(handlers.CreatePostHandler)
+
+	router.Methods("POST").Path("/habit/mark").HandlerFunc(handlers.CreatePostHandler)
+	router.Methods("GET").Path("/search").HandlerFunc(handlers.CreatePostHandler)
 
 	// Start the server
 	fmt.Println("Starting server on :8080...")

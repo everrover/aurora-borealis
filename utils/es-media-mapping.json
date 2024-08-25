@@ -1,5 +1,6 @@
 {
   "settings": {
+    "index.max_ngram_diff": 25,
     "analysis": {
       "tokenizer": {
         "ngram_tokenizer": {
@@ -72,8 +73,7 @@
             "type": "text",
             "analyzer": "hash_analyzer"
           }
-        },
-        "boost": 4
+        }
       },
       "auto_generated_tags": {
         "type": "text",
@@ -82,8 +82,7 @@
             "type": "text",
             "analyzer": "hash_analyzer"
           }
-        },
-        "boost": 2
+        }
       },
       "id": {
         "type": "keyword"
@@ -93,8 +92,7 @@
         "format": "strict_date_optional_time||epoch_millis"
       },
       "author": {
-        "type": "keyword",
-        "boost": 4
+        "type": "keyword"
       },
       "slug": {
         "type": "text",
@@ -105,9 +103,8 @@
           }
         }
       },
-      "metadata": {
-        "type": "text",
-        "boost": 0.75
+      "meta_data": {
+        "type": "text"
       },
       "comments": {
         "type": "nested",
@@ -140,8 +137,7 @@
             "type": "text",
             "analyzer": "ngram_analyzer"
           }
-        },
-        "boost": 0.5
+        }
       },
       "short_summary": {
         "type": "text"
@@ -153,15 +149,13 @@
             "type": "text",
             "analyzer": "ngram_analyzer"
           }
-        },
-        "boost": 1.25
+        }
       },
       "sentiment": {
         "type": "keyword"
       },
       "category": {
-        "type": "keyword",
-        "boost": 1.5
+        "type": "keyword"
       },
       "ideal_for": {
         "type": "keyword"

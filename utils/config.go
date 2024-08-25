@@ -6,10 +6,16 @@ import (
 )
 
 const (
-	S3BucketName     = "your-s3-bucket-name"
-	ESIndexName      = "posts"
-	LOCAL_DIR        = "./posts/" // TB imported at run configs
-	ElasticSearchURL = "http://localhost:9200"
+	S3BucketName                = "your-s3-bucket-name"
+	ESIndexName                 = "posts"
+	LOCAL_DIR                   = "./posts/" // TB imported at run configs
+	ES_POST_INDEX_MAPPING       = "./utils/es-mapping.json"
+	ES_POST_MEDIA_INDEX_MAPPING = "./utils/es-media-mapping.json"
+	ES_POST_INDEX_NAME          = "post_idx_v0001"
+	ES_POST_MEDIA_INDEX_NAME    = "post_media_idx_v0001"
+	ES_POST_INDEX_ALIAS         = "post_index"
+	ES_POST_MEDIA_INDEX_ALIAS   = "post_media_index"
+	ElasticSearchURL            = "http://localhost:9200"
 )
 
 var (

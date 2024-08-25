@@ -66,9 +66,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	//analysisMeta, err := services.RunMediaAnalysis(postForAnalysis)
 
 	analysisMeta, err := services.RunNLPAnalysis(*postForAnalysis)
-	if analysisMeta != nil && (len(analysisMeta.Hashtags) > 0) {
-		hashtags = append(hashtags, analysisMeta.Hashtags...)
-	}
 	if err != nil {
 		http.Error(w, "Error running analysis", http.StatusInternalServerError)
 	}
@@ -79,6 +76,12 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post *models.Post = models.NewPost(postReq.ID, postMediaLinks, postContents, author, hashtags, postedAt)
 
 	// Add post to ES
+	id, err := services.SaveToElasticsearch(*post)
+	if err != nil {
+		http.Error(w, "Error saving to Elasticsearch", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("Post saved to ES with id", id)
 
 	// Create post file and upload it
 	services.SaveFileContents(post.Slug, *post, 1)

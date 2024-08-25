@@ -19,3 +19,16 @@ Inputs:
 - Keywords
 - Constraints : NONE
 - Usable search engines : ALL by default
+
+TODO:
+
+- [ ] AWS uploads (media/post files)
+- [ ] AWS deployment (media/post files)
+- [ ] GCP uploads (media/post files)
+- [ ] NeptuneDB integration and analysis
+- [ ] Migration jobs
+- [ ] Share on social media - generate/review/post
+  - [ ] Twitter
+  - [ ] Instagram
+  - [ ] LinkedIn
+  - [ ] Website

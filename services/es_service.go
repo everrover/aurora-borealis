@@ -5,6 +5,7 @@ import (
 	utils "aurora-borealis/utils"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
@@ -15,18 +16,21 @@ import (
 )
 
 // SaveToElasticsearch indexes the post in Elasticsearch
-func SaveToElasticsearch(post models.Post) error {
+func SaveToElasticsearch(post models.Post) (string, error) {
 	doc := map[string]interface{}{
 		//"title":   post.Title,
 		"content": post.Content,
 		"date":    time.Now().Format(time.RFC3339),
 	}
 
-	_, err := utils.ESClient.Index().
+	id, err := utils.ESClient.Index().
 		Index(utils.ESIndexName).
 		BodyJson(doc).
 		Do(context.Background())
-	return err
+	if err != nil || id == nil {
+		return "", err
+	}
+	return id.Id, err
 }
 
 var esClient *elasticsearch.Client
@@ -42,7 +46,7 @@ func InitElasticsearch() {
 		log.Fatalf("Error creating the client: %s", err)
 	}
 	esClient = client
-	createInitialIndex("")
+	createInitialIndex()
 }
 
 func GetElasticsearchClient() *elasticsearch.Client { return esClient }
@@ -50,7 +54,7 @@ func GetElasticsearchClient() *elasticsearch.Client { return esClient }
 func createNewIndexIfNotExists(indexName string, indexMapping string) {
 
 	exists, err := esClient.Indices.Exists([]string{indexName})
-	if err != nil || exists.StatusCode != 200 {
+	if err != nil || exists.StatusCode == 200 {
 		log.Println("Index already exists")
 		return
 	}
@@ -79,40 +83,80 @@ func createNewIndexIfNotExists(indexName string, indexMapping string) {
 }
 
 func mapAliasToIndex(aliasName, indexName string) {
-	// Create an alias for the index
-	aliasReq := esapi.IndicesPutAliasRequest{
-		Body: bytes.NewReader([]byte(fmt.Sprintf(`{
-			"actions": [
-				{ "remove": { "alias": "%s", "index": "*" } },
-				{ "add": { "alias": "%s", "index": "%s" } }
-			]
-		}`, aliasName, aliasName, indexName))),
+	// Check if the alias already exists
+	alias, err := esClient.Indices.GetAlias(
+		esClient.Indices.GetAlias.WithContext(context.Background()),
+		esClient.Indices.GetAlias.WithName(aliasName),
+	)
+	if err != nil || alias.IsError() {
+		log.Println("Some bullshit happened")
 	}
-	aliasRes, err := aliasReq.Do(context.Background(), esClient)
+
+	var putAliasReq esapi.IndicesPutAliasRequest
+	if alias.StatusCode != 200 {
+		log.Println("Alias does not exist")
+		// Create an alias for the index
+
+		// Add the alias to the index
+		putAliasReq = esapi.IndicesPutAliasRequest{
+			Body: bytes.NewReader([]byte(fmt.Sprintf(`{
+				"actions": [
+					{ "add": { "alias": "%s", "index": "%s" } }
+				]
+			}`, aliasName, indexName))),
+		}
+	} else {
+		var aliasResponse map[string]interface{}
+		if err := json.NewDecoder(alias.Body).Decode(&aliasResponse); err != nil {
+			log.Fatalf("Error parsing response body: %s", err)
+		}
+
+		var currentIndex string
+		for index := range aliasResponse {
+			currentIndex = index
+			break
+		}
+
+		if currentIndex == indexName {
+			log.Println("Alias already mapped to the index")
+			return
+		}
+
+		putAliasReq = esapi.IndicesPutAliasRequest{
+			Body: bytes.NewReader([]byte(fmt.Sprintf(`{
+				"actions": [
+					{ "remove": { "alias": "%s", "index": "%s" } },
+					{ "add": { "alias": "%s", "index": "%s" } }
+				]
+			}`, aliasName, currentIndex, aliasName, indexName))),
+		}
+
+		fmt.Println("Req is: ", putAliasReq.Body)
+	}
+	aliasRes, err := putAliasReq.Do(context.Background(), esClient)
 	if err != nil || aliasRes.IsError() {
 		log.Fatalf("Error creating alias/Error response from Elasticsearch: %s / %s", err, aliasRes.String())
 	}
 	defer aliasRes.Body.Close()
 }
 
-func createInitialIndex(indexName string) {
-	if indexName == "" {
-		indexName = "posts_idx_v0001"
-	}
+func createInitialIndex() {
+	createNewIndexIfNotExists(utils.ES_POST_INDEX_NAME, utils.ES_POST_INDEX_MAPPING)
+	//mapAliasToIndex(utils.ES_POST_INDEX_ALIAS, utils.ES_POST_INDEX_NAME)
 
-	createNewIndexIfNotExists(indexName, "utils/es-mapping.json")
-	mapAliasToIndex("post_index", indexName)
+	createNewIndexIfNotExists(utils.ES_POST_MEDIA_INDEX_NAME, utils.ES_POST_MEDIA_INDEX_MAPPING)
+	//mapAliasToIndex(utils.ES_POST_MEDIA_INDEX_ALIAS, utils.ES_POST_MEDIA_INDEX_NAME)
 
 	fmt.Println("Index and alias created successfully")
 }
 
-func CreateNewIndexWithMapping(indexName string, mappingFile string) {
+func CreateNewIndexWithMapping(indexName string, mappingFile string, aliasName string) {
 	if indexName == "" || mappingFile == "" {
 		log.Fatalf("Index name and mapping are required")
 	}
 
 	createNewIndexIfNotExists(indexName, mappingFile)
-	mapAliasToIndex("post_index", indexName)
+	mapAliasToIndex(aliasName, indexName)
 
 	fmt.Println("Index and alias created and remapped successfully")
 }
