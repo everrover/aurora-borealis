@@ -2,21 +2,28 @@ package models
 
 // Post represents a markdown post
 type Post struct {
-	Media      string            `json:"media"`     // ip - user - video, audio, image, and others path
-	Content    string            `json:"content"`   // ip - user
-	SelfLike   bool              `json:"self_like"` // ip - user
-	Tags       []string          `json:"tags"`      // prefixed with #
-	ID         string            `json:"id"`        // auto generated
-	PostedAt   string            `json:"posted_at"` // ip - system
-	Author     string            `json:"author"`    // ip - system
-	Slug       string            `json:"slug"`      // ip - system
-	Metadata   string            `json:"metadata"`  // auto-gen via AI analysis
-	Comments   []Comment         `json:"comments"`  // CommentIDs
-	Likes      int               `json:"likes"`     // Count of likes
-	WhatAISays map[string]string `json:"what_ai_says"`
+	Media       []string          `json:"media"`         // ip - user - video, audio, image, and others path
+	Content     string            `json:"content"`       // ip - user
+	SelfLike    bool              `json:"self_like"`     // ip - user
+	Tags        []string          `json:"tags"`          // prefixed with #
+	AutoGenTags []string          `json:"auto_gen_tags"` // prefixed with #
+	ID          string            `json:"id"`            // auto generated
+	PostedAt    string            `json:"posted_at"`     // ip - system
+	Author      string            `json:"author"`        // ip - system
+	Slug        string            `json:"slug"`          // ip - system
+	Metadata    string            `json:"metadata"`      // auto-gen via AI analysis
+	Comments    []Comment         `json:"comments"`      // CommentIDs
+	Likes       int               `json:"likes"`         // Count of likes
+	WhatAISays  map[string]string `json:"what_ai_says"`
+
+	ShortSummary string   `json:"short_summary"`
+	Title        string   `json:"title"`
+	Sentiment    string   `json:"sentiment"`
+	Category     string   `json:"category"`
+	IdealFor     []string `json:"ideal_for"`
 }
 
-func NewPost(slug string, media string, content string, author string, hashtags []string, postedAt string) *Post {
+func NewPost(slug string, media []string, content string, author string, hashtags []string, postedAt string) *Post {
 	return &Post{
 		Media:      media,
 		Content:    content,

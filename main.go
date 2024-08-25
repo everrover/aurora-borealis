@@ -2,6 +2,7 @@ package main
 
 import (
 	"aurora-borealis/handlers"
+	"aurora-borealis/services"
 	"aurora-borealis/utils"
 	"fmt"
 	gmux "github.com/gorilla/mux"
@@ -11,6 +12,7 @@ import (
 func main() {
 	// Load configuration and initialize services
 	utils.Initialize()
+	services.InitElasticsearch()
 
 	// Set up routes
 	//mux := http.NewServeMux()

@@ -1,0 +1,171 @@
+{
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 3,
+          "max_gram": 8,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        },
+        "hash_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        },
+        "edge_ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 3,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      },
+      "analyzer": {
+        "ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "hash_analyzer": {
+          "type": "custom",
+          "tokenizer": "hash_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "media": {
+        "type": "keyword"
+      },
+      "content": {
+        "type": "text",
+        "fields": {
+          "ngrams": {
+            "type": "text",
+            "analyzer": "ngram_analyzer"
+          }
+        }
+      },
+      "self_like": {
+        "type": "boolean"
+      },
+      "tags": {
+        "type": "text",
+        "fields": {
+          "hash": {
+            "type": "text",
+            "analyzer": "hash_analyzer"
+          }
+        },
+        "boost": 4
+      },
+      "auto_generated_tags": {
+        "type": "text",
+        "fields": {
+          "hash": {
+            "type": "text",
+            "analyzer": "hash_analyzer"
+          }
+        },
+        "boost": 2
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "posted_at": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "author": {
+        "type": "keyword",
+        "boost": 4
+      },
+      "slug": {
+        "type": "text",
+        "fields": {
+          "ngrams": {
+            "type": "text",
+            "analyzer": "ngram_analyzer"
+          }
+        }
+      },
+      "metadata": {
+        "type": "text",
+        "boost": 0.75
+      },
+      "comments": {
+        "type": "nested",
+        "properties": {
+          "content": {
+            "type": "text"
+          },
+          "posted_at": {
+            "type": "date",
+            "format": "strict_date_optional_time||epoch_millis"
+          },
+          "author": {
+            "type": "keyword"
+          },
+          "likes": {
+            "type": "integer"
+          },
+          "self_like": {
+            "type": "boolean"
+          }
+        }
+      },
+      "likes": {
+        "type": "integer"
+      },
+      "what_ai_says": {
+        "type": "text",
+        "fields": {
+          "ngrams": {
+            "type": "text",
+            "analyzer": "ngram_analyzer"
+          }
+        },
+        "boost": 0.5
+      },
+      "short_summary": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "ngrams": {
+            "type": "text",
+            "analyzer": "ngram_analyzer"
+          }
+        },
+        "boost": 1.25
+      },
+      "sentiment": {
+        "type": "keyword"
+      },
+      "category": {
+        "type": "keyword",
+        "boost": 1.5
+      },
+      "ideal_for": {
+        "type": "keyword"
+      }
+    }
+  }
+}

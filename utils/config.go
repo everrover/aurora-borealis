@@ -8,7 +8,7 @@ import (
 const (
 	S3BucketName     = "your-s3-bucket-name"
 	ESIndexName      = "posts"
-	LocalDir         = "./posts" // TB imported at run configs
+	LOCAL_DIR        = "./posts/" // TB imported at run configs
 	ElasticSearchURL = "http://localhost:9200"
 )
 
