@@ -73,7 +73,10 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(analysisMeta)
 
 	// Create post entity
-	var post *models.Post = models.NewPost(postReq.ID, postMediaLinks, postContents, author, hashtags, postedAt)
+	var post *models.Post = models.NewPost(
+		postMediaLinks, postContents, false, hashtags, analysisMeta.Hashtags, analysisMeta.Slug,
+		postedAt, author, analysisMeta.Slug, "", 0, analysisMeta.WhatWeSay, analysisMeta.ShortSummary,
+		analysisMeta.Title, analysisMeta.Sentiment, analysisMeta.Category, analysisMeta.IdealFor)
 
 	// Add post to ES
 	id, err := services.SaveToElasticsearch(*post)

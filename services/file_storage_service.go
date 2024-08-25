@@ -55,7 +55,7 @@ func saveToLocal(slug, content string) error {
 	}
 	// Check if the file already exists
 	_, err := os.Stat(filepath.Join(utils.LOCAL_DIR, slug+".md"))
-	if err == nil {
+	if err != nil {
 		slug = slug + "-(1)"
 		_, err = os.Stat(filepath.Join(utils.LOCAL_DIR, slug+".md"))
 		if err == nil {

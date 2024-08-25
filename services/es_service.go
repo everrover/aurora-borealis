@@ -12,25 +12,36 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"time"
 )
 
 // SaveToElasticsearch indexes the post in Elasticsearch
 func SaveToElasticsearch(post models.Post) (string, error) {
-	doc := map[string]interface{}{
-		//"title":   post.Title,
-		"content": post.Content,
-		"date":    time.Now().Format(time.RFC3339),
-	}
-
-	id, err := utils.ESClient.Index().
-		Index(utils.ESIndexName).
-		BodyJson(doc).
-		Do(context.Background())
-	if err != nil || id == nil {
+	// Marshal the post into JSON
+	postJSON, err := json.Marshal(post)
+	if err != nil {
 		return "", err
 	}
-	return id.Id, err
+
+	// Create the request
+	req := esapi.IndexRequest{
+		Index:      utils.ES_POST_INDEX_NAME,
+		DocumentID: post.Slug,
+		Body:       bytes.NewReader(postJSON),
+		Refresh:    "true",
+	}
+
+	// Perform the request with the client
+	res, err := req.Do(context.Background(), esClient)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		return "", fmt.Errorf("Error indexing document: %s", res.String())
+	}
+
+	return post.Slug, nil
 }
 
 var esClient *elasticsearch.Client

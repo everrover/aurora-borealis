@@ -15,6 +15,10 @@ func CreatePostFileContents(post models.Post) string {
 	for _, tag := range post.Tags {
 		tagsString += tag + ","
 	}
+	idealForString := ""
+	for _, idealFor := range post.IdealFor {
+		idealForString += idealFor + ","
+	}
 
 	content := fmt.Sprintf(`
 ---
@@ -38,6 +42,6 @@ ideal_for: %s
 %s
 `, mediaString, post.SelfLike, tagsString, post.ID, post.PostedAt,
 		post.Author, post.Slug, post.Metadata, post.Likes, post.WhatAISays,
-		post.ShortSummary, post.Title, post.Sentiment, post.Category, post.IdealFor, post.Content)
+		post.ShortSummary, post.Title, post.Sentiment, post.Category, idealForString, post.Content)
 	return content
 }
